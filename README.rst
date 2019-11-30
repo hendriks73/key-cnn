@@ -92,7 +92,7 @@ Citation
 ========
 
 If you use Key-CNN in your work, please consider citing it.
-ShallowTemp, DeepTemp, and DeepSquare models:
+ShallowSpec, DeepSpec, and DeepSquare models:
 
 .. code-block:: latex
 
