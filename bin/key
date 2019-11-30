@@ -38,8 +38,8 @@ def main():
                         version='key 0.0.1')
     parser.add_argument('-m', '--model',
                         nargs='?',
-                        default='deepkey',
-                        help='model name [deepkey|deepsquare|shallowkey], defaults to deepkey')
+                        default='deepspec',
+                        help='model name [deepspec|deepsquare|shallowspec], defaults to deepspec')
     output_format = parser.add_mutually_exclusive_group()
     output_format.add_argument('--mirex',
                                help='use MIREX format for output',

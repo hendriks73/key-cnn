@@ -58,8 +58,8 @@ def main():
                         help='hop length between predictions, 1 hop = 1.489s',
                         default=8, type=int)
     parser.add_argument('-m', '--model', nargs='?',
-                        default='deepkey',
-                        help='model name [deepkey|deepsquare|shallowkey], defaults to deepkey')
+                        default='deepspec',
+                        help='model name [deepspec|deepsquare|shallowspec], defaults to deepspec')
     parser.add_argument('audio_file', nargs='+', help='audio file to process')
 
     # parse arguments
@@ -149,7 +149,8 @@ def main():
 
         if args.png:
             plt.tight_layout()
-            fig.savefig(file + '.png', dpi=300)
+            #fig.savefig(file + '.png', dpi=300)
+            fig.savefig(file + '.pdf')
         else:
             plt.show()
 
