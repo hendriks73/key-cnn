@@ -1,0 +1,160 @@
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+keygram generator
+"""
+
+import argparse
+
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.ticker import ScalarFormatter
+
+from keycnn.classifier import KeyClassifier
+from keycnn.feature import read_features
+
+MAJOR_FIFTHS = [(i*7+13) % 12 for i in range(12)]
+MINOR_FIFTHS = [((i*7+10) % 12)+12 for i in range(12)]
+
+FIFTHS_INDICES = [None]*24
+FIFTHS_INDICES[1::2] = MAJOR_FIFTHS
+FIFTHS_INDICES[::2] = MINOR_FIFTHS
+
+
+def main():
+    """keygram"""
+
+    # define parser
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter, description='''
+    The program 'keygram' estimates local keys for a given file and displays
+    their probability distributions in a graph. 
+    The underlying algorithm is described in detail in:
+
+    Hendrik Schreiber, Meinard Müller,
+    "Musical Key and Key Estimation using Convolutional
+    Neural Networks with Directional Filters"
+    Proceedings of the Sound and Music Computing Conference (SMC),
+    Málaga, Spain, 2019.
+    
+    License: GNU Affero General Public License v3
+    ''')
+
+    parser.add_argument('-v', '--version', action='version', version='keygram 0.0.1')
+    parser.add_argument('-p', '--png',
+                        help='write the keygram to a file, '
+                             'adding the file extension .png to the input file name',
+                        action="store_true")
+    parser.add_argument('-c', '--csv',
+                        help='write the keygram data to a csv file, '
+                             'adding the file extension .csv to the input file name',
+                        action="store_true")
+    parser.add_argument('-s', '--sharpen',
+                        help='sharpen the image to a one-hot representation',
+                        action="store_true")
+    parser.add_argument('-n', '--norm-frame',
+                        help='enable framewise normalization using (max|l1|l2)')
+    parser.add_argument('--hop-length',
+                        help='hop length between predictions, 1 hop = 1.489s',
+                        default=8, type=int)
+    parser.add_argument('-m', '--model', nargs='?',
+                        default='deepkey',
+                        help='model name [deepkey|deepsquare|shallowkey], defaults to deepkey')
+    parser.add_argument('audio_file', nargs='+', help='audio file to process')
+
+    # parse arguments
+    args = parser.parse_args()
+
+    # load model
+    print('Loading model \'{}\'...'.format(args.model))
+    classifier = KeyClassifier(args.model)
+    print('Loaded model with {} parameters.'.format(classifier.model.count_params()))
+
+    hop_length = args.hop_length
+    sr = 22050.0
+    fft_hop_length = 4096.0
+
+    print('Processing file(s)', end='', flush=True)
+    for file in args.audio_file:
+        print('.', end='', flush=True)
+        features = read_features(file, hop_length=hop_length, zero_pad=True)
+        predictions = classifier.estimate(features)
+
+        if args.norm_frame is not None:
+            norm_order = np.inf
+            if 'max' == args.norm_frame.lower():
+                norm_order = np.inf
+            elif 'l1' == args.norm_frame.lower():
+                norm_order = 1
+            elif 'l2' == args.norm_frame.lower():
+                norm_order = 2
+            else:
+                print('Unknown norm. Using max norm.', end='', flush=True)
+            predictions = (predictions.T / np.linalg.norm(predictions, ord=norm_order, axis=1)).T
+
+        if args.sharpen:
+            predictions = (predictions.T / np.max(predictions, axis=1)).T
+            predictions = np.where(predictions != 1, 0, predictions)
+
+        max_windows = predictions.shape[0] * hop_length
+        max_length_in_s = max_windows * (fft_hop_length / sr)
+        frame_length = (fft_hop_length / sr) * hop_length
+
+        fig = plt.figure()
+        fig.canvas.set_window_title('keygram: ' + file)
+        if args.png:
+            fig.set_size_inches(5, 2)
+        ax = fig.add_subplot(111)
+        #ax.set_ylim((0, 24))
+
+        ax.imshow(predictions.T[FIFTHS_INDICES, :], origin='lower', cmap='Greys', aspect='auto',
+                  extent=(-frame_length/2., max_length_in_s-frame_length/2, -0.5, 23.5))
+
+        ax.set_xlabel('Time (seconds)')
+        ax.set_ylabel('Key')
+        ax.set_yticks([i for i in range(24)], minor=False)
+        ax.set_yticklabels(['{}:{}'.format(classifier.to_key(i)[0], classifier.to_key(i)[1]) for i in FIFTHS_INDICES], minor=False)
+
+        column_names = ['{}:{}'.format(classifier.to_key(i)[0], classifier.to_key(i)[1]) for i in range(24)]
+
+        if args.csv:
+            if args.sharpen:
+                # we simply argmax
+                index = np.argmax(predictions, axis=1)
+                key = classifier.to_key(index)
+                np.savetxt(file + '.csv',
+                           key,
+                           fmt='%s',
+                           delimiter=",",
+                           comments='',
+                           header='# Predictions using model \'{}\' '
+                                  'argmax of key distribution '
+                                  'feature frequency={} Hz '
+                                  'i.e. {} s/feature (rows)\ntonic,mode'
+                           .format(classifier.model_name,
+                                   1./frame_length,
+                                   frame_length))
+            else:
+                np.savetxt(file + '.csv',
+                           predictions,
+                           fmt='%1.6f',
+                           delimiter=",",
+                           comments='',
+                           header=('Predictions using model \'{}\' '
+                                  'feature frequency={} Hz '
+                                  'i.e. {} s/feature (rows)\n' + (','.join(column_names)))
+                           .format(classifier.model_name,
+                                   1./frame_length,
+                                   frame_length))
+
+        if args.png:
+            plt.tight_layout()
+            fig.savefig(file + '.png', dpi=300)
+        else:
+            plt.show()
+
+    print('\nDone')
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,149 @@
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+Key estimator
+"""
+
+import argparse
+import sys
+from os.path import splitext, dirname, basename, join
+
+import jams
+import librosa
+
+from keycnn.classifier import KeyClassifier
+from keycnn.feature import read_features
+
+
+def main():
+    """key"""
+
+    # define parser
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter, description='''
+    The program 'key' estimates a global key for a given file.
+    The underlying algorithm is described in detail in:
+    
+    Hendrik Schreiber, Meinard Müller,
+    "Musical Key and Key Estimation using Convolutional
+    Neural Networks with Directional Filters"
+    Proceedings of the Sound and Music Computing Conference (SMC),
+    Málaga, Spain, 2019.
+    
+    License: GNU Affero General Public License v3
+    ''')
+
+    parser.add_argument('-v', '--version',
+                        action='version',
+                        version='key 0.0.1')
+    parser.add_argument('-m', '--model',
+                        nargs='?',
+                        default='deepkey',
+                        help='model name [deepkey|deepsquare|shallowkey], defaults to deepkey')
+    output_format = parser.add_mutually_exclusive_group()
+    output_format.add_argument('--mirex',
+                               help='use MIREX format for output',
+                               action="store_true")
+    output_format.add_argument('--jams',
+                               help='use JAMS format for output',
+                               action="store_true")
+    parser.add_argument('-i', '--input',
+                        nargs='+',
+                        help='input audio file(s) to process')
+
+    output_options = parser.add_mutually_exclusive_group()
+    output_location = parser.add_mutually_exclusive_group()
+    output_location.add_argument('-o', '--output',
+                                 nargs='*',
+                                 help='output file(s)')
+    output_location.add_argument('-d', '--outputdir',
+                                 help='output directory')
+    output_options.add_argument('-e', '--extension',
+                                help='append given extension to original file name for results')
+    output_options.add_argument('-c', '--cont',
+                                help='continue after error, if multiple files are processed',
+                                action='store_true')
+
+    # parse arguments
+    args = parser.parse_args()
+
+    if args.output is not None and 0 < len(args.output) != len(args.input):
+        print('Number of input files ({}) must match number of output files ({}).\nInput={}\nOutput={}'
+              .format(len(args.input), len(args.output), args.input, args.output), file=sys.stderr)
+        parser.print_help(file=sys.stderr)
+        sys.exit(1)
+
+    if args.input is None:
+        print('No input files given.', file=sys.stderr)
+        parser.print_help(file=sys.stderr)
+        sys.exit(1)
+
+    # load model
+    print('Loading model \'{}\'...'.format(args.model))
+    classifier = KeyClassifier(args.model)
+    print('Loaded model with {} parameters.'.format(classifier.model.count_params()))
+
+    print('Processing file(s)', end='', flush=True)
+    for index, input_file in enumerate(args.input):
+        try:
+            print('.', end='', flush=True)
+            features = read_features(input_file)
+
+            tonic, mode = classifier.estimate_key(features)
+            if args.mirex or args.jams:
+                if args.mirex:
+                    result = '{}\t{}'.format(tonic, mode)
+                else:
+                    result = jams.JAMS()
+                    y, sr = librosa.load(input_file)
+                    track_duration = librosa.get_duration(y=y, sr=sr)
+                    result.file_metadata.duration = track_duration
+                    result.file_metadata.identifiers = {'file': basename(input_file)}
+                    key_a = jams.Annotation(namespace='key_mode', time=0, duration=track_duration)
+                    key_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.1',
+                                                                        annotation_tools='schreiber key-cnn (model=' + args.model + '), https://github.com/hendriks73/key-cnn',
+                                                                        data_source='Hendrik Schreiber and Meinard Müller. '
+                                                                                    'Musical Key and Key Estimation using Convolutional Neural Networks with Directional Filters. '
+                                                                                    'In Proceedings of the Sound and Music Computing Conference (SMC), '
+                                                                                    'Málaga, Spain, 2019.')
+                    key_a.append(time=0.0,
+                                 duration=track_duration,
+                                 value='{}:{}'.format(tonic, mode))
+                    result.annotations.append(key_a)
+            else:
+                if mode == 'major':
+                    result = tonic
+                elif mode == 'minor':
+                    result = '{}m'.format(tonic)
+                else:
+                    result = '{}{}'.format(tonic, mode)
+            output_file = None
+            file_dir = dirname(input_file)
+            file_name = basename(input_file)
+            if args.outputdir is not None:
+                file_dir = args.outputdir
+            if args.jams:
+                base, file_extension = splitext(file_name)
+                output_file = join(file_dir, base + '.jams')
+            elif args.extension is not None:
+                output_file = join(file_dir, file_name + args.extension)
+            elif args.output is not None and index < len(args.output):
+                output_file = args.output[index]
+            if args.jams:
+                result.save(output_file)
+            elif output_file is None:
+                print('\n' + result)
+            else:
+                with open(output_file, mode='w') as file_name:
+                    file_name.write(result + '\n')
+        except Exception as e:
+            if not args.cont:
+                print('\nAn error occurred while processing \'{}\':\n{}\n'.format(input_file, e), file=sys.stderr)
+                raise e
+            else:
+                print('E({})'.format(input_file), end='', flush=True)
+    print('\nDone')
+
+
+if __name__ == '__main__':
+    main()
