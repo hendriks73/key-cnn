@@ -96,8 +96,8 @@ ShallowTemp, DeepTemp, and DeepSquare models:
 
 .. code-block:: latex
 
-   @inproceedings{SchreiberM19_CNNKeyKey_SMC,
-      Title = {Musical Key and Key Estimation using Convolutional Neural Networks with Directional Filters},
+   @inproceedings{SchreiberM19_CNNKeyTempo_SMC,
+      Title = {Musical Tempo and Key Estimation using Convolutional Neural Networks with Directional Filters},
       Author = {Hendrik Schreiber and Meinard M{\"u}ller},
       Booktitle = {Proceedings of the Sound and Music Computing Conference ({SMC})},
       Pages = {47--54},
