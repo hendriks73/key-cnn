@@ -26,7 +26,7 @@ paper [1], please run
     key -m deepsquare --jams -i my_audio.wav
 
 
-To use one of the ``ShallowSpec`` models from [3] (see also repo
+To use one of the ``ShallowSpec`` models from [1] (see also repo
 `directional_cnns <https://github.com/hendriks73/directional_cnns>`_), run
 
 .. code-block:: console
