@@ -108,7 +108,7 @@ ShallowTemp, DeepTemp, and DeepSquare models:
 References
 ==========
 
-.. [1] Hendrik Schreiber, Meinard Müller, `Musical Key and Key Estimation using Convolutional
+.. [1] Hendrik Schreiber, Meinard Müller, `Musical Tempo and Key Estimation using Convolutional
     Neural Networks with Directional Filters
     <http://smc2019.uma.es/articles/P1/P1_07_SMC2019_paper.pdf>`_
     Proceedings of the Sound and Music Computing Conference (SMC),
