@@ -46,7 +46,7 @@ For batch processing, you may want to run ``key`` like this:
 
 .. code-block:: console
 
-    find /your_audio_dir/ -name '*.wav' | xargs key -d /output_dir/ -i
+    find /your_audio_dir/ -name '*.wav' -print0 | xargs -0 key -d /output_dir/ -i
 
 This will recursively search for all ``.wav`` files in ``/your_audio_dir/``, analyze then
 and write the results to individual files in ``/output_dir/``. Because the model is only
