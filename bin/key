@@ -39,7 +39,7 @@ def main():
     parser.add_argument('-m', '--model',
                         nargs='?',
                         default='deepspec',
-                        help='model name [deepspec|deepsquare|shallowspec], defaults to deepspec')
+                        help='model name [deepspec|deepsquare|shallowspec|winterreise|...], defaults to deepspec')
     output_format = parser.add_mutually_exclusive_group()
     output_format.add_argument('--mirex',
                                help='use MIREX format for output',
@@ -81,6 +81,7 @@ def main():
     # load model
     print('Loading model \'{}\'...'.format(args.model))
     classifier = KeyClassifier(args.model)
+    print('Effective model name: {}'.format(classifier.model_name))
     print('Loaded model with {} parameters.'.format(classifier.model.count_params()))
 
     print('Processing file(s)', end='', flush=True)

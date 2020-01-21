@@ -53,13 +53,48 @@ class KeyClassifier:
 
         self.to_key = to_major_minor_key
 
-        # match aliases for specific deep/shallow models
-        if model_name == 'deepspec':
-            model_name = 'deepspec_k16'
-        elif model_name == 'shallowspec':
-            model_name = 'shallowspec_k4'
-        elif model_name == 'deepsquare':
-            model_name = 'deepsquare_k8'
+        # aliases for specific deep/shallow models
+        aliases = {
+            'deepspec': 'deepspec_k16',
+            'shallowspec': 'shallowspec_k4',
+            'deepsquare': 'deepsquare_k8',
+            'winterreise': 'ds_winterreise_v_fold0_HU33_OL06_QU98_SC06_TR99',
+            'winterreise_v': 'ds_winterreise_v_fold0_HU33_OL06_QU98_SC06_TR99',
+            'winterreise_v_fold0': 'ds_winterreise_v_fold0_HU33_OL06_QU98_SC06_TR99',
+            'winterreise_v_fold1': 'ds_winterreise_v_fold1_SC06_TR99_AL98_FI55_FI66',
+            'winterreise_v_fold2': 'ds_winterreise_v_fold2_FI55_FI66_FI80_HU33_OL06',
+            'winterreise_s': 'ds_winterreise_s_fold0_12_13_14_15_16_17_18_19_20_21_22_23_24',
+            'winterreise_s_fold0': 'ds_winterreise_s_fold0_12_13_14_15_16_17_18_19_20_21_22_23_24',
+            'winterreise_s_fold1': 'ds_winterreise_s_fold1_20_21_22_23_24_01_02_03_04_05_06_07_08',
+            'winterreise_s_fold2': 'ds_winterreise_s_fold2_04_05_06_07_08_09_10_11_12_13_14_15_16',
+            'winterreise_n': 'ds_winterreise_n_fold_NOT_AL98_FI55_FI66_01_02_03_FI80_HU33_04_05',
+            'winterreise_n_fold00': 'ds_winterreise_n_fold_NOT_AL98_FI55_FI66_01_02_03_FI80_HU33_04_05',
+            'winterreise_n_fold01': 'ds_winterreise_n_fold_NOT_AL98_FI55_FI66_04_05_06_FI80_HU33_07_08',
+            'winterreise_n_fold02': 'ds_winterreise_n_fold_NOT_AL98_FI55_FI66_07_08_09_FI80_HU33_10_11',
+            'winterreise_n_fold03': 'ds_winterreise_n_fold_NOT_AL98_FI55_FI66_10_11_12_FI80_HU33_13_14',
+            'winterreise_n_fold04': 'ds_winterreise_n_fold_NOT_AL98_FI55_FI66_13_14_15_FI80_HU33_16_17',
+            'winterreise_n_fold05': 'ds_winterreise_n_fold_NOT_AL98_FI55_FI66_16_17_18_FI80_HU33_19_20',
+            'winterreise_n_fold06': 'ds_winterreise_n_fold_NOT_AL98_FI55_FI66_19_20_21_FI80_HU33_22_23',
+            'winterreise_n_fold07': 'ds_winterreise_n_fold_NOT_AL98_FI55_FI66_22_23_24_FI80_HU33_01_02',
+            'winterreise_n_fold08': 'ds_winterreise_n_fold_NOT_FI80_HU33_OL06_01_02_03_QU98_SC06_04_05',
+            'winterreise_n_fold09': 'ds_winterreise_n_fold_NOT_FI80_HU33_OL06_04_05_06_QU98_SC06_07_08',
+            'winterreise_n_fold10': 'ds_winterreise_n_fold_NOT_FI80_HU33_OL06_07_08_09_QU98_SC06_10_11',
+            'winterreise_n_fold11': 'ds_winterreise_n_fold_NOT_FI80_HU33_OL06_10_11_12_QU98_SC06_13_14',
+            'winterreise_n_fold12': 'ds_winterreise_n_fold_NOT_FI80_HU33_OL06_13_14_15_QU98_SC06_16_17',
+            'winterreise_n_fold13': 'ds_winterreise_n_fold_NOT_FI80_HU33_OL06_16_17_18_QU98_SC06_19_20',
+            'winterreise_n_fold14': 'ds_winterreise_n_fold_NOT_FI80_HU33_OL06_19_20_21_QU98_SC06_22_23',
+            'winterreise_n_fold15': 'ds_winterreise_n_fold_NOT_FI80_HU33_OL06_22_23_24_QU98_SC06_01_02',
+            'winterreise_n_fold16': 'ds_winterreise_n_fold_NOT_QU98_SC06_TR99_01_02_03_AL98_FI55_04_05',
+            'winterreise_n_fold17': 'ds_winterreise_n_fold_NOT_QU98_SC06_TR99_04_05_06_AL98_FI55_07_08',
+            'winterreise_n_fold18': 'ds_winterreise_n_fold_NOT_QU98_SC06_TR99_07_08_09_AL98_FI55_10_11',
+            'winterreise_n_fold19': 'ds_winterreise_n_fold_NOT_QU98_SC06_TR99_10_11_12_AL98_FI55_13_14',
+            'winterreise_n_fold20': 'ds_winterreise_n_fold_NOT_QU98_SC06_TR99_13_14_15_AL98_FI55_16_17',
+            'winterreise_n_fold21': 'ds_winterreise_n_fold_NOT_QU98_SC06_TR99_16_17_18_AL98_FI55_19_20',
+            'winterreise_n_fold22': 'ds_winterreise_n_fold_NOT_QU98_SC06_TR99_19_20_21_AL98_FI55_22_23',
+            'winterreise_n_fold23': 'ds_winterreise_n_fold_NOT_QU98_SC06_TR99_22_23_24_AL98_FI55_01_02',
+        }
+        if model_name in aliases:
+            model_name = aliases[model_name]
         self.model_name = model_name
 
         self.normalize = std_normalizer

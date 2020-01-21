@@ -12,6 +12,10 @@ class TestKeyClassifier(unittest.TestCase):
         key_classifier = KeyClassifier('deepspec')
         self.assertIsNotNone(key_classifier.model)
 
+    def test_winterreise_init(self):
+        key_classifier = KeyClassifier('winterreise')
+        self.assertIsNotNone(key_classifier.model)
+
     def test_bad_model_name(self):
         try:
             KeyClassifier('bad_model_name')

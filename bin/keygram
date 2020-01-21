@@ -8,7 +8,6 @@ import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.ticker import ScalarFormatter
 
 from keycnn.classifier import KeyClassifier
 from keycnn.feature import read_features
@@ -59,7 +58,7 @@ def main():
                         default=8, type=int)
     parser.add_argument('-m', '--model', nargs='?',
                         default='deepspec',
-                        help='model name [deepspec|deepsquare|shallowspec], defaults to deepspec')
+                        help='model name [deepspec|deepsquare|shallowspec|winterreise|...], defaults to deepspec')
     parser.add_argument('audio_file', nargs='+', help='audio file to process')
 
     # parse arguments
@@ -68,6 +67,7 @@ def main():
     # load model
     print('Loading model \'{}\'...'.format(args.model))
     classifier = KeyClassifier(args.model)
+    print('Effective model name: {}'.format(classifier.model_name))
     print('Loaded model with {} parameters.'.format(classifier.model.count_params()))
 
     hop_length = args.hop_length
@@ -105,7 +105,7 @@ def main():
         if args.png:
             fig.set_size_inches(5, 2)
         ax = fig.add_subplot(111)
-        #ax.set_ylim((0, 24))
+        # ax.set_ylim((0, 24))
 
         ax.imshow(predictions.T[FIFTHS_INDICES, :], origin='lower', cmap='Greys', aspect='auto',
                   extent=(-frame_length/2., max_length_in_s-frame_length/2, -0.5, 23.5))
@@ -141,15 +141,15 @@ def main():
                            delimiter=",",
                            comments='',
                            header=('Predictions using model \'{}\' '
-                                  'feature frequency={} Hz '
-                                  'i.e. {} s/feature (rows)\n' + (','.join(column_names)))
+                                   'feature frequency={} Hz '
+                                   'i.e. {} s/feature (rows)\n' + (','.join(column_names)))
                            .format(classifier.model_name,
                                    1./frame_length,
                                    frame_length))
 
         if args.png:
             plt.tight_layout()
-            #fig.savefig(file + '.png', dpi=300)
+            # fig.savefig(file + '.png', dpi=300)
             fig.savefig(file + '.pdf')
         else:
             plt.show()
