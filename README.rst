@@ -26,7 +26,7 @@ paper [1], please run
     key -m deepsquare --jams -i my_audio.wav
 
 
-To use one of the ``ShallowSpec`` models from [1] (see also repo
+To use one of the ``DeepSpec`` models from [1] (see also repo
 `directional_cnns <https://github.com/hendriks73/directional_cnns>`_), run
 
 .. code-block:: console
@@ -41,6 +41,21 @@ or,
 
 if you want to use a higher capacity model (some ``k``-values are supported).
 ``deepsquare`` and ``shallowspec`` models may also be used.
+
+For estimation using models trained for [2], you may run one of the following
+model specs:
+
+.. code-block:: console
+
+    key -m winterreise -i my_audio.wav
+    key -m winterreise_v -i my_audio.wav
+    key -m winterreise_s -i my_audio.wav
+    key -m winterreise_v_fold0 -i my_audio.wav
+    key -m winterreise_s_fold1 -i my_audio.wav
+
+For more model names and split training split definitions, please see the `models directory
+in the GitHub repo <https://github.com/hendriks73/key-cnn/tree/master/keycnn/models>`_
+(just remove the ``.h5`` from the file name to use as model name).
 
 For batch processing, you may want to run ``key`` like this:
 
@@ -105,6 +120,19 @@ ShallowSpec, DeepSpec, and DeepSquare models:
       Address = {M{\'a}laga, Spain}
    }
 
+
+All Winterreise [2] models:
+
+.. code-block:: latex
+
+   @inproceedings{SchreiberWM20_HMMCNNLocalKey_ICASSP,
+      Title = {Local Key Estimation in Classical Music Recordings: A Cross-Version Study on {Schubert's} {Winterreise}},
+      Author = {Hendrik Schreiber, Christof Wei{\ss}, Meinard M{\"u}ller},
+      Booktitle = {Proceedings of the {IEEE} International Conference on Acoustics, Speech, and Signal Processing ({ICASSP})},
+      Year = {2020},
+      Address = {Barcelona, Spain}
+   }
+
 References
 ==========
 
@@ -113,3 +141,8 @@ References
     <http://smc2019.uma.es/articles/P1/P1_07_SMC2019_paper.pdf>`_
     Proceedings of the Sound and Music Computing Conference (SMC),
     Málaga, Spain, 2019.
+
+.. [2] Hendrik Schreiber, Christof Weiß, Meinard Müller,
+    Local Key Estimation in Classical Music Recordings: A Cross-Version Study on Schubert's Winterreise.
+    Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP),
+    Barcelona, Spain, 2020.
