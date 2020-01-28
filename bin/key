@@ -30,6 +30,13 @@ def main():
     Proceedings of the Sound and Music Computing Conference (SMC),
     Málaga, Spain, 2019.
     
+    Winterreise models are from:
+    
+    Hendrik Schreiber, Christof Weiß, Meinard Müller
+    "Local Key Estimation in Classical Music Recordings: A Cross-Version Study on Schubert's Winterreise."
+    Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP),
+    Barcelona, Spain, 2020.
+    
     License: GNU Affero General Public License v3
     ''')
 
@@ -101,12 +108,20 @@ def main():
                     result.file_metadata.duration = track_duration
                     result.file_metadata.identifiers = {'file': basename(input_file)}
                     key_a = jams.Annotation(namespace='key_mode', time=0, duration=track_duration)
-                    key_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.1',
-                                                                        annotation_tools='schreiber key-cnn (model=' + args.model + '), https://github.com/hendriks73/key-cnn',
-                                                                        data_source='Hendrik Schreiber and Meinard Müller. '
-                                                                                    'Musical Key and Key Estimation using Convolutional Neural Networks with Directional Filters. '
-                                                                                    'In Proceedings of the Sound and Music Computing Conference (SMC), '
-                                                                                    'Málaga, Spain, 2019.')
+                    if 'winterreise' in classifier.model_name:
+                        key_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.2',
+                                                                            annotation_tools='schreiber key-cnn (model=' + args.model + '), https://github.com/hendriks73/key-cnn',
+                                                                            data_source='Hendrik Schreiber, Christof Weiß, Meinard Müller. '
+                                                                                        'Local Key Estimation in Classical Music Recordings: A Cross-Version Study on Schubert\'s Winterreise. '
+                                                                                        'In Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP), '
+                                                                                        'Barcelona, Spain, 2020.')
+                    else:
+                        key_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.2',
+                                                                            annotation_tools='schreiber key-cnn (model=' + args.model + '), https://github.com/hendriks73/key-cnn',
+                                                                            data_source='Hendrik Schreiber and Meinard Müller. '
+                                                                                        'Musical Key and Key Estimation using Convolutional Neural Networks with Directional Filters. '
+                                                                                        'In Proceedings of the Sound and Music Computing Conference (SMC), '
+                                                                                        'Málaga, Spain, 2019.')
                     key_a.append(time=0.0,
                                  duration=track_duration,
                                  value='{}:{}'.format(tonic, mode))
