@@ -56,6 +56,8 @@ model specs:
 For more model names and split training split definitions, please see the `models directory
 in the GitHub repo <https://github.com/hendriks73/key-cnn/tree/master/keycnn/models>`_
 (just remove the ``.h5`` from the file name to use as model name).
+The groundtruth annotations for Winterreise models may be found
+`here <https://github.com/hendriks73/key-cnn/tree/master/annotations/winterreise>`_
 
 For batch processing, you may want to run ``key`` like this:
 
@@ -121,7 +123,7 @@ ShallowSpec, DeepSpec, and DeepSquare models:
    }
 
 
-All Winterreise [2] models:
+All Winterreise [2] models and annotations:
 
 .. code-block:: latex
 
