@@ -143,7 +143,8 @@ References
     <http://smc2019.uma.es/articles/P1/P1_07_SMC2019_paper.pdf>`_
     Proceedings of the Sound and Music Computing Conference (SMC),
     Málaga, Spain, 2019.
-.. [2] Hendrik Schreiber, Christof Weiß, Meinard Müller,
-    "Local Key Estimation in Classical Music Recordings: A Cross-Version Study on Schubert's Winterreise."
+.. [2] Hendrik Schreiber, Christof Weiß, Meinard Müller, `Local Key Estimation in Classical Music
+    Recordings: A Cross-Version Study on Schubert's Winterreise.
+    <https://ieeexplore.ieee.org/document/9054642>`_
     Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP),
     Barcelona, Spain, 2020.
