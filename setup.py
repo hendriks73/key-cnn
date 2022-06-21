@@ -77,7 +77,7 @@ classifiers = ['Development Status :: 3 - Alpha',
 
 # requirements
 requirements = ['scipy>=1.0.1',
-                'numpy==1.16.0',
+                'numpy==1.22.0',
                 'tensorflow==1.15.2',
                 'librosa==0.6.2',
                 'jams>=0.3.1',
